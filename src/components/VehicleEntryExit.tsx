@@ -433,9 +433,20 @@ export default function VehicleEntryExit() {
       // Draw the current video frame to the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       
-      console.log('Image captured, processing with OpenCV and Tesseract...');
+      console.log('Image captured, dimensions:', canvas.width, 'x', canvas.height);
+      
+      // Show progress feedback
+      toast({
+        title: "Processing",
+        description: "Analyzing image for license plate...",
+      });
       
       // Process the image to detect and recognize license plate
+      console.log('Processing with OpenCV and Tesseract...');
+      
+      // We'll add a delay to ensure the UI toast shows before processing
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const licensePlateText = await processLicensePlate(canvas);
       
       if (licensePlateText) {
@@ -443,30 +454,38 @@ export default function VehicleEntryExit() {
         // Set the license plate text in the input field
         setLicensePlate(licensePlateText);
         
+        // Close camera dialog and processing state
+        setIsCameraOpen(false);
+        setIsProcessing(false);
+        stopCamera();
+        
         toast({
           title: "License Plate Detected",
           description: `Detected plate: ${licensePlateText}`,
         });
       } else {
         console.log('No license plate detected');
+        
+        // Keep camera open to allow another try
+        setIsProcessing(false);
+        
         toast({
           title: "Detection Failed",
-          description: "No license plate detected. Please try again.",
+          description: "No license plate detected. Try adjusting camera position or lighting and try again.",
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Error processing license plate:', error);
+      
+      // Keep camera open to allow another try
+      setIsProcessing(false);
+      
       toast({
         title: "Detection Error",
-        description: "An error occurred while processing the image.",
+        description: "An error occurred while processing the image. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      // Close camera dialog and processing state
-      setIsCameraOpen(false);
-      setIsProcessing(false);
-      stopCamera();
     }
   };
 
