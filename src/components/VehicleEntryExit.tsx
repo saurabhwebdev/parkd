@@ -527,10 +527,10 @@ export default function VehicleEntryExit() {
   };
 
   return (
-    <div className="container mx-auto py-4 px-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h1 className="text-2xl font-bold">Vehicle Entry/Exit</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" asChild className="h-8">
             <Link to="/zone-management" className="flex items-center">
               <Layers className="mr-1 h-3 w-3" />
@@ -549,7 +549,7 @@ export default function VehicleEntryExit() {
                 <Plus className="mr-1 h-3 w-3" /> Entry
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md max-w-[95vw] w-full">
               <DialogHeader>
                 <DialogTitle>Record Vehicle Entry</DialogTitle>
                 <DialogDescription>
@@ -557,7 +557,7 @@ export default function VehicleEntryExit() {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-3 py-3">
                 <div className="grid gap-2">
                   <Label htmlFor="licensePlate" className="flex items-center">
                     License Plate <span className="text-red-500 ml-1">*</span>
@@ -649,8 +649,8 @@ export default function VehicleEntryExit() {
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0" align="start">
-                      <div className="max-h-[300px] overflow-auto">
+                    <PopoverContent className="w-full sm:w-[300px] p-0" align="start">
+                      <div className="max-h-[50vh] sm:max-h-[300px] overflow-auto">
                         {spots.length === 0 ? (
                           <div className="p-2 text-sm text-muted-foreground">No available spots</div>
                         ) : (
@@ -697,7 +697,7 @@ export default function VehicleEntryExit() {
                                       <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                                         Section {section}
                                       </div>
-                                      <div className="grid grid-cols-4 gap-1 p-1">
+                                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-1 p-1">
                                         {spotsBySection[section]
                                           .sort((a, b) => a.spotNumber.localeCompare(b.spotNumber, undefined, { numeric: true }))
                                           .map(spot => (
@@ -788,7 +788,7 @@ export default function VehicleEntryExit() {
       ) : (
         <>
           {/* Dashboard Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -834,16 +834,16 @@ export default function VehicleEntryExit() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
             <TabsList className="w-full mb-2 bg-transparent border-b p-0 h-auto">
-              <div className="flex">
+              <div className="flex w-full">
                 <TabsTrigger 
                   value="active" 
-                  className="data-[state=active]:border-b-2 data-[state=active]:border-black data-[state=active]:shadow-none rounded-none bg-transparent px-4 py-2 h-auto"
+                  className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-black data-[state=active]:shadow-none rounded-none bg-transparent px-2 sm:px-4 py-2 h-auto text-xs sm:text-sm"
                 >
                   Active Vehicles
                 </TabsTrigger>
                 <TabsTrigger 
                   value="history" 
-                  className="data-[state=active]:border-b-2 data-[state=active]:border-black data-[state=active]:shadow-none rounded-none bg-transparent px-4 py-2 h-auto"
+                  className="flex-1 data-[state=active]:border-b-2 data-[state=active]:border-black data-[state=active]:shadow-none rounded-none bg-transparent px-2 sm:px-4 py-2 h-auto text-xs sm:text-sm"
                 >
                   Vehicle History
                 </TabsTrigger>
@@ -869,110 +869,112 @@ export default function VehicleEntryExit() {
                       <p className="text-gray-500 text-sm">No vehicles currently parked</p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-xs font-medium">License Plate</TableHead>
-                            <TableHead className="text-xs font-medium">Zone</TableHead>
-                            <TableHead className="text-xs font-medium">Entry Time</TableHead>
-                            <TableHead className="text-xs font-medium text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {activeRecords.map(record => (
-                            <TableRow key={record.id}>
-                              <TableCell className="font-medium text-sm py-2">{record.licensePlate}</TableCell>
-                              <TableCell className="py-2">
-                                <Badge variant="outline" className="font-normal text-xs">
-                                  {getZoneName(record.zoneId)}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-xs py-2">{formatDate(record.entryTime.toDate())}</TableCell>
-                              <TableCell className="text-right py-2">
-                                <Dialog open={isExitDialogOpen && currentRecord === record.id} onOpenChange={(open) => {
-                                  setIsExitDialogOpen(open);
-                                  if (!open) {
-                                    setExitDetails(null);
-                                  }
-                                }}>
-                                  <DialogTrigger asChild>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm"
-                                      onClick={() => openExitDialog(record.id!)}
-                                      className="h-7 text-xs"
-                                    >
-                                      <LogOut className="mr-1 h-3 w-3" />
-                                      Exit
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>Record Vehicle Exit</DialogTitle>
-                                      <DialogDescription>
-                                        {exitDetails ? 'Vehicle exit has been recorded.' : 'Confirm the exit of this vehicle.'}
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    
-                                    {exitDetails ? (
-                                      <div className="space-y-4">
-                                        <div className="p-4 bg-black/5 rounded-lg space-y-2">
-                                          <div className="flex justify-between">
-                                            <span className="text-sm font-medium">License Plate:</span>
-                                            <span className="text-sm">{exitDetails.licensePlate}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                            <span className="text-sm font-medium">Entry Time:</span>
-                                            <span className="text-sm">{formatDate(exitDetails.entryTime)}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                            <span className="text-sm font-medium">Exit Time:</span>
-                                            <span className="text-sm">{formatDate(exitDetails.exitTime)}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                            <span className="text-sm font-medium">Duration:</span>
-                                            <span className="text-sm">{formatDuration(exitDetails.durationMinutes)}</span>
-                                          </div>
-                                          <div className="flex justify-between border-t pt-2 mt-2">
-                                            <span className="font-medium">Fee:</span>
-                                            <span className="font-bold">
-                                              {getCurrencySymbol(exitDetails.currency)}{exitDetails.fee.toFixed(2)} {exitDetails.currency || 'USD'}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        
-                                        <DialogFooter>
-                                          <Button 
-                                            onClick={() => {
-                                              setIsExitDialogOpen(false);
-                                              setExitDetails(null);
-                                            }}
-                                          >
-                                            Close
-                                          </Button>
-                                        </DialogFooter>
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        <div className="py-4">
-                                          <p className="text-center">
-                                            Are you sure you want to record the exit for vehicle <strong>{record.licensePlate}</strong>?
-                                          </p>
-                                        </div>
-                                        <DialogFooter>
-                                          <Button variant="outline" onClick={() => setIsExitDialogOpen(false)}>Cancel</Button>
-                                          <Button onClick={handleExitSubmit}>Confirm Exit</Button>
-                                        </DialogFooter>
-                                      </div>
-                                    )}
-                                  </DialogContent>
-                                </Dialog>
-                              </TableCell>
+                    <div className="overflow-x-auto -mx-1 sm:mx-0">
+                      <div className="min-w-[500px] sm:min-w-full">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="text-xs font-medium">License Plate</TableHead>
+                              <TableHead className="text-xs font-medium">Zone</TableHead>
+                              <TableHead className="text-xs font-medium">Entry Time</TableHead>
+                              <TableHead className="text-xs font-medium text-right">Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {activeRecords.map(record => (
+                              <TableRow key={record.id}>
+                                <TableCell className="font-medium text-sm py-2">{record.licensePlate}</TableCell>
+                                <TableCell className="py-2">
+                                  <Badge variant="outline" className="font-normal text-xs">
+                                    {getZoneName(record.zoneId)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-xs py-2">{formatDate(record.entryTime.toDate())}</TableCell>
+                                <TableCell className="text-right py-2">
+                                  <Dialog open={isExitDialogOpen && currentRecord === record.id} onOpenChange={(open) => {
+                                    setIsExitDialogOpen(open);
+                                    if (!open) {
+                                      setExitDetails(null);
+                                    }
+                                  }}>
+                                    <DialogTrigger asChild>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={() => openExitDialog(record.id!)}
+                                        className="h-7 text-xs"
+                                      >
+                                        <LogOut className="mr-1 h-3 w-3" />
+                                        Exit
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md max-w-[95vw] w-full">
+                                      <DialogHeader>
+                                        <DialogTitle>Record Vehicle Exit</DialogTitle>
+                                        <DialogDescription>
+                                          {exitDetails ? 'Vehicle exit has been recorded.' : 'Confirm the exit of this vehicle.'}
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      
+                                      {exitDetails ? (
+                                        <div className="space-y-3">
+                                          <div className="p-3 bg-black/5 rounded-lg space-y-2">
+                                            <div className="flex justify-between">
+                                              <span className="text-sm font-medium">License Plate:</span>
+                                              <span className="text-sm">{exitDetails.licensePlate}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-sm font-medium">Entry Time:</span>
+                                              <span className="text-sm">{formatDate(exitDetails.entryTime)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-sm font-medium">Exit Time:</span>
+                                              <span className="text-sm">{formatDate(exitDetails.exitTime)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-sm font-medium">Duration:</span>
+                                              <span className="text-sm">{formatDuration(exitDetails.durationMinutes)}</span>
+                                            </div>
+                                            <div className="flex justify-between border-t pt-2 mt-2">
+                                              <span className="font-medium">Fee:</span>
+                                              <span className="font-bold">
+                                                {getCurrencySymbol(exitDetails.currency)}{exitDetails.fee.toFixed(2)} {exitDetails.currency || 'USD'}
+                                              </span>
+                                            </div>
+                                          </div>
+                                          
+                                          <DialogFooter>
+                                            <Button 
+                                              onClick={() => {
+                                                setIsExitDialogOpen(false);
+                                                setExitDetails(null);
+                                              }}
+                                            >
+                                              Close
+                                            </Button>
+                                          </DialogFooter>
+                                        </div>
+                                      ) : (
+                                        <div>
+                                          <div className="py-4">
+                                            <p className="text-center">
+                                              Are you sure you want to record the exit for vehicle <strong>{record.licensePlate}</strong>?
+                                            </p>
+                                          </div>
+                                          <DialogFooter>
+                                            <Button variant="outline" onClick={() => setIsExitDialogOpen(false)}>Cancel</Button>
+                                            <Button onClick={handleExitSubmit}>Confirm Exit</Button>
+                                          </DialogFooter>
+                                        </div>
+                                      )}
+                                    </DialogContent>
+                                  </Dialog>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -1018,8 +1020,8 @@ export default function VehicleEntryExit() {
                 <CardContent className="p-4">
                   {/* Filters Section */}
                   <div className="bg-gray-50 p-3 rounded-md mb-4">
-                    <div className="flex flex-wrap gap-3 mb-3">
-                      <div className="flex-1 min-w-[180px]">
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-3">
+                      <div className="flex-1 min-w-[160px]">
                         <Label htmlFor="start-date" className="text-xs mb-1 block">Start Date</Label>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -1043,7 +1045,7 @@ export default function VehicleEntryExit() {
                         </Popover>
                       </div>
                       
-                      <div className="flex-1 min-w-[180px]">
+                      <div className="flex-1 min-w-[160px]">
                         <Label htmlFor="end-date" className="text-xs mb-1 block">End Date</Label>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -1068,14 +1070,14 @@ export default function VehicleEntryExit() {
                       </div>
                       
                       <div className="flex items-end">
-                        <Button onClick={fetchHistoryRecords} size="sm" className="h-8 mb-0 text-xs">
+                        <Button onClick={fetchHistoryRecords} size="sm" className="h-8 mb-0 text-xs w-full sm:w-auto">
                           Apply
                         </Button>
                       </div>
                     </div>
                     
-                    <div className="flex flex-wrap gap-3">
-                      <div className="flex-1 min-w-[180px]">
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+                      <div className="flex-1 min-w-[160px]">
                         <Label htmlFor="license-filter" className="text-xs mb-1 block">License Plate</Label>
                         <Input
                           id="license-filter"
@@ -1086,7 +1088,7 @@ export default function VehicleEntryExit() {
                         />
                       </div>
                       
-                      <div className="flex-1 min-w-[180px]">
+                      <div className="flex-1 min-w-[160px]">
                         <Label htmlFor="zone-filter" className="text-xs mb-1 block">Zone</Label>
                         <Select
                           value={zoneFilter || undefined}
@@ -1106,7 +1108,7 @@ export default function VehicleEntryExit() {
                         </Select>
                       </div>
                       
-                      <div className="flex-1 min-w-[180px]">
+                      <div className="flex-1 min-w-[160px]">
                         <Label htmlFor="status-filter" className="text-xs mb-1 block">Status</Label>
                         <Select
                           value={statusFilter || undefined}
@@ -1124,7 +1126,7 @@ export default function VehicleEntryExit() {
                       </div>
                       
                       <div className="flex items-end">
-                        <Button variant="outline" onClick={resetFilters} size="sm" className="h-8 mb-0 text-xs">
+                        <Button variant="outline" onClick={resetFilters} size="sm" className="h-8 mb-0 text-xs w-full sm:w-auto">
                           <Filter className="mr-1 h-3 w-3" />
                           Reset
                         </Button>
@@ -1141,115 +1143,117 @@ export default function VehicleEntryExit() {
                       <p className="text-gray-500 text-sm">No vehicle records found in the selected date range</p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('licensePlate')}>
-                              <div className="flex items-center">
-                                License Plate
-                                {sortField === 'licensePlate' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('zone')}>
-                              <div className="flex items-center">
-                                Zone
-                                {sortField === 'zone' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('entryTime')}>
-                              <div className="flex items-center">
-                                Entry Time
-                                {sortField === 'entryTime' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('exitTime')}>
-                              <div className="flex items-center">
-                                Exit Time
-                                {sortField === 'exitTime' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('duration')}>
-                              <div className="flex items-center">
-                                Duration
-                                {sortField === 'duration' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('fee')}>
-                              <div className="flex items-center">
-                                Fee
-                                {sortField === 'fee' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                            <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('status')}>
-                              <div className="flex items-center">
-                                Status
-                                {sortField === 'status' && (
-                                  sortDirection === 'asc' ? 
-                                    <ChevronUp className="ml-1 h-3 w-3" /> : 
-                                    <ChevronDown className="ml-1 h-3 w-3" />
-                                )}
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredAndSortedHistoryRecords().map(record => (
-                            <TableRow key={record.id}>
-                              <TableCell className="font-medium text-sm py-2">{record.licensePlate}</TableCell>
-                              <TableCell className="py-2">
-                                <Badge variant="outline" className="font-normal text-xs">
-                                  {getZoneName(record.zoneId)}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-xs py-2">{formatDate(record.entryTime.toDate())}</TableCell>
-                              <TableCell className="text-xs py-2">
-                                {record.exitTime ? formatDate(record.exitTime.toDate()) : "-"}
-                              </TableCell>
-                              <TableCell className="text-xs py-2">
-                                {record.durationMinutes ? formatDuration(record.durationMinutes) : "-"}
-                              </TableCell>
-                              <TableCell className="text-xs py-2">
-                                {record.fee ? `${getCurrencySymbol(record.currency)}${record.fee.toFixed(2)}` : "-"}
-                              </TableCell>
-                              <TableCell className="py-2">
-                                <Badge 
-                                  variant={record.status === VehicleStatus.PARKED ? "secondary" : "outline"}
-                                  className="text-xs"
-                                >
-                                  {record.status === VehicleStatus.PARKED ? "Parked" : "Exited"}
-                                </Badge>
-                              </TableCell>
+                    <div className="overflow-x-auto -mx-1 sm:mx-0">
+                      <div className="min-w-[700px] sm:min-w-full">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('licensePlate')}>
+                                <div className="flex items-center">
+                                  License Plate
+                                  {sortField === 'licensePlate' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('zone')}>
+                                <div className="flex items-center">
+                                  Zone
+                                  {sortField === 'zone' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('entryTime')}>
+                                <div className="flex items-center">
+                                  Entry Time
+                                  {sortField === 'entryTime' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('exitTime')}>
+                                <div className="flex items-center">
+                                  Exit Time
+                                  {sortField === 'exitTime' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('duration')}>
+                                <div className="flex items-center">
+                                  Duration
+                                  {sortField === 'duration' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('fee')}>
+                                <div className="flex items-center">
+                                  Fee
+                                  {sortField === 'fee' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="cursor-pointer text-xs font-medium" onClick={() => handleSort('status')}>
+                                <div className="flex items-center">
+                                  Status
+                                  {sortField === 'status' && (
+                                    sortDirection === 'asc' ? 
+                                      <ChevronUp className="ml-1 h-3 w-3" /> : 
+                                      <ChevronDown className="ml-1 h-3 w-3" />
+                                  )}
+                                </div>
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                      <div className="text-xs text-black/60 mt-3 px-2">
-                        Showing {filteredAndSortedHistoryRecords().length} of {historyRecords.length} records
+                          </TableHeader>
+                          <TableBody>
+                            {filteredAndSortedHistoryRecords().map(record => (
+                              <TableRow key={record.id}>
+                                <TableCell className="font-medium text-sm py-2">{record.licensePlate}</TableCell>
+                                <TableCell className="py-2">
+                                  <Badge variant="outline" className="font-normal text-xs">
+                                    {getZoneName(record.zoneId)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-xs py-2">{formatDate(record.entryTime.toDate())}</TableCell>
+                                <TableCell className="text-xs py-2">
+                                  {record.exitTime ? formatDate(record.exitTime.toDate()) : "-"}
+                                </TableCell>
+                                <TableCell className="text-xs py-2">
+                                  {record.durationMinutes ? formatDuration(record.durationMinutes) : "-"}
+                                </TableCell>
+                                <TableCell className="text-xs py-2">
+                                  {record.fee ? `${getCurrencySymbol(record.currency)}${record.fee.toFixed(2)}` : "-"}
+                                </TableCell>
+                                <TableCell className="py-2">
+                                  <Badge 
+                                    variant={record.status === VehicleStatus.PARKED ? "secondary" : "outline"}
+                                    className="text-xs"
+                                  >
+                                    {record.status === VehicleStatus.PARKED ? "Parked" : "Exited"}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        <div className="text-xs text-black/60 mt-3 px-2">
+                          Showing {filteredAndSortedHistoryRecords().length} of {historyRecords.length} records
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1267,16 +1271,15 @@ export default function VehicleEntryExit() {
           stopCamera();
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-w-[95vw] w-full">
           <DialogHeader>
             <DialogTitle>Scan License Plate</DialogTitle>
             <DialogDescription>
               Position the camera so the vehicle and license plate are clearly visible.
-              Our AI-powered system will detect the vehicle and read the plate automatically.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-3">
             <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
               <video 
                 ref={videoRef} 
@@ -1295,8 +1298,7 @@ export default function VehicleEntryExit() {
             </div>
             
             <div className="text-xs text-muted-foreground text-center">
-              First, the system will detect vehicles using TensorFlow.js.<br/>
-              Then, it will use cloud-based recognition to identify the license plate.
+              The system will detect and recognize the license plate automatically.
             </div>
             
             <div className="flex gap-2 w-full">
