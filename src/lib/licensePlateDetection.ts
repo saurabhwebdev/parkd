@@ -1,15 +1,34 @@
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';  // Import WebGL backend
+import '@tensorflow/tfjs-backend-cpu';    // Import CPU backend as fallback
 import { config } from './config';
 
 // Holds the loaded COCO-SSD model instance
 let model: cocoSsd.ObjectDetection | null = null;
 
 /**
- * Initialize TensorFlow COCO-SSD model for vehicle detection
+ * Initialize TensorFlow.js model for vehicle detection
  */
 export const initDetectionModel = async () => {
   if (!model) {
     try {
+      console.log('Setting up TensorFlow.js backends...');
+      
+      // Try to use WebGL backend first, fall back to CPU if needed
+      try {
+        await tf.setBackend('webgl');
+        console.log('Using WebGL backend');
+      } catch (error) {
+        console.warn('WebGL backend failed, falling back to CPU:', error);
+        await tf.setBackend('cpu');
+        console.log('Using CPU backend');
+      }
+      
+      // Set flags for better performance
+      tf.env().set('WEBGL_CPU_FORWARD', false);
+      tf.env().set('WEBGL_PACK', true);
+      
       console.log('Loading COCO-SSD model...');
       model = await cocoSsd.load();
       console.log('COCO-SSD model loaded successfully');

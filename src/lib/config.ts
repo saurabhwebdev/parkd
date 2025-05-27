@@ -23,7 +23,7 @@ const getEnvVariable = (key: string, defaultValue: string): string => {
 
 export const config = {
   // Plate Recognizer API key
-  plateRecognizerApiKey: getEnvVariable('PLATE_RECOGNIZER_API_KEY', 'YOUR_API_KEY'),
+  plateRecognizerApiKey: getEnvVariable('PLATE_RECOGNIZER_API_KEY', '272c606e628464bfffdc7b57c2bd41f86167e899'),
   
   // Plate recognition settings
   plateRecognition: {
