@@ -13,8 +13,7 @@ import {
   getParkingSpotsByZone,
   getParkingRecordsHistory
 } from '@/lib/parkingService';
-import { processLicensePlate, cleanup, initTesseract } from '@/lib/licensePlateDetection';
-import { loadOpenCV } from '@/lib/opencvLoader';
+import { processLicensePlate, cleanup, initDetectionModel } from '@/lib/licensePlateDetection';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -83,8 +82,8 @@ export default function VehicleEntryExit() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Add loading state for OpenCV
-  const [isOpenCVLoading, setIsOpenCVLoading] = useState(false);
+  // Add loading state for the model
+  const [isModelLoading, setIsModelLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -442,7 +441,7 @@ export default function VehicleEntryExit() {
       });
       
       // Process the image to detect and recognize license plate
-      console.log('Processing with OpenCV and Tesseract...');
+      console.log('Processing with TensorFlow.js and Plate Recognizer API...');
       
       // We'll add a delay to ensure the UI toast shows before processing
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -493,25 +492,22 @@ export default function VehicleEntryExit() {
   useEffect(() => {
     return () => {
       stopCamera();
-      cleanup(); // Clean up Tesseract worker
+      cleanup(); // Clean up resources
     };
   }, []);
 
   // Function to handle camera button click
   const handleCameraClick = async () => {
     try {
-      setIsOpenCVLoading(true);
+      setIsModelLoading(true);
       
-      // Start loading OpenCV.js and initialize Tesseract
-      console.log('Loading OpenCV and initializing Tesseract...');
+      // Initialize TensorFlow.js model
+      console.log('Loading TensorFlow model...');
       
-      // Initialize Tesseract worker in advance
-      await initTesseract();
+      // Initialize model in advance
+      await initDetectionModel();
       
-      // Load OpenCV
-      await loadOpenCV();
-      
-      console.log('Libraries loaded successfully');
+      console.log('Model loaded successfully');
       
       // Open camera dialog
       setIsCameraOpen(true);
@@ -519,14 +515,14 @@ export default function VehicleEntryExit() {
       // Start camera after dialog is open
       setTimeout(startCamera, 100);
     } catch (error) {
-      console.error('Error loading libraries:', error);
+      console.error('Error loading model:', error);
       toast({
         title: "Loading Error",
-        description: "Failed to load image processing libraries. Check console for details.",
+        description: "Failed to load vehicle detection model. Check console for details.",
         variant: "destructive"
       });
     } finally {
-      setIsOpenCVLoading(false);
+      setIsModelLoading(false);
     }
   };
 
@@ -580,10 +576,10 @@ export default function VehicleEntryExit() {
                       variant="outline"
                       size="icon"
                       onClick={handleCameraClick}
-                      disabled={isOpenCVLoading}
+                      disabled={isModelLoading}
                       title="Scan license plate"
                     >
-                      {isOpenCVLoading ? (
+                      {isModelLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Camera className="h-4 w-4" />
@@ -1275,7 +1271,8 @@ export default function VehicleEntryExit() {
           <DialogHeader>
             <DialogTitle>Scan License Plate</DialogTitle>
             <DialogDescription>
-              Position the camera so the license plate is clearly visible
+              Position the camera so the vehicle and license plate are clearly visible.
+              Our AI-powered system will detect the vehicle and read the plate automatically.
             </DialogDescription>
           </DialogHeader>
           
@@ -1295,6 +1292,11 @@ export default function VehicleEntryExit() {
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                 </div>
               )}
+            </div>
+            
+            <div className="text-xs text-muted-foreground text-center">
+              First, the system will detect vehicles using TensorFlow.js.<br/>
+              Then, it will use cloud-based recognition to identify the license plate.
             </div>
             
             <div className="flex gap-2 w-full">
